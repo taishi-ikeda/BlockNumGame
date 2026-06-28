@@ -108,9 +108,9 @@ public:
         rotate_button_ = new QPushButton("Rotate", this);
         drop_button_ = new QPushButton("Drop", this);
         control_layout_->addWidget(left_button_);
-        control_layout_->addWidget(right_button_);
         control_layout_->addWidget(rotate_button_);
         control_layout_->addWidget(drop_button_);
+        control_layout_->addWidget(right_button_);  
         main_layout_->addLayout(control_layout_);
 
         // ウィンドウサイズの設定

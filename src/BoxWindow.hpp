@@ -135,26 +135,28 @@ protected:
             }
         }
         if(!isPause()) {
-            switch (currentRotation_)
-            {
-                case rotationEnum::BottomUp:
-                    drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
-                    drawBlock(painter, currentX_, currentY_ - 1, currentBlockInfo_[1]);
-                    break;
-                case rotationEnum::UpBottom:
-                    drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
-                    drawBlock(painter, currentX_, currentY_+1, currentBlockInfo_[1]);
-                    break;
-                case rotationEnum::LeftRight:
-                    drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
-                    drawBlock(painter, currentX_+1, currentY_, currentBlockInfo_[1]);
-                    break;
-                case rotationEnum::RightLeft:
-                    drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
-                    drawBlock(painter, currentX_-1, currentY_, currentBlockInfo_[1]);
-                    break;
-                default:
-                    break;
+            if(current_execution_state_ == executionState::droppingBlock) {
+                switch (currentRotation_)
+                {
+                    case rotationEnum::BottomUp:
+                        drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
+                        drawBlock(painter, currentX_, currentY_ - 1, currentBlockInfo_[1]);
+                        break;
+                    case rotationEnum::UpBottom:
+                        drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
+                        drawBlock(painter, currentX_, currentY_+1, currentBlockInfo_[1]);
+                        break;
+                    case rotationEnum::LeftRight:
+                        drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
+                        drawBlock(painter, currentX_+1, currentY_, currentBlockInfo_[1]);
+                        break;
+                    case rotationEnum::RightLeft:
+                        drawBlock(painter, currentX_, currentY_, currentBlockInfo_[0]);
+                        drawBlock(painter, currentX_-1, currentY_, currentBlockInfo_[1]);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -289,7 +291,7 @@ protected:
                     }
 
                     // 4つ以上繋がっていたら消去
-                    if (sum >= blockSumNum_) {
+                    if (sum >= blockSumNum_ && connected.size() >= 4) {
                         for (const QPoint& p : connected) {
                             board_[p.y()][p.x()].first = blockColor::None;
                             board_[p.y()][p.x()].second = 0;
@@ -302,7 +304,7 @@ protected:
             }
             if (!anyErased) break;
         }
-
+        this->update();
         if(current_execution_state_ != executionState::applyingGravity) {
             spawnPuyo();
         }
@@ -352,30 +354,41 @@ protected:
 
     public:
     void decrementCurrentX() {
-        if (canMove(currentX_ - 1, currentY_)) {
-            currentX_--;
+        if(current_execution_state_ == executionState::droppingBlock) {
+            if (canMove(currentX_ - 1, currentY_)) {
+                currentX_--;
+            }
         }
     }
 
     void incrementCurrentX() {
-        if (canMove(currentX_ + 1, currentY_)) {
-            currentX_++;
+        if(current_execution_state_ == executionState::droppingBlock) {
+            if (canMove(currentX_ + 1, currentY_)) {
+                currentX_++;
+            }
         }
     }
 
     void incrementCurrentY() {
-        if (canMove(currentX_, currentY_ + 1)) {
-            currentY_++;
+        if(current_execution_state_ == executionState::droppingBlock) {
+            if (canMove(currentX_, currentY_ + 1)) {
+                currentY_++;
+            }
         }
     }
 
     void decrementCurrentY() {
-        if (canMove(currentX_, currentY_ - 1)) {
-            currentY_--;
+        if(current_execution_state_ == executionState::droppingBlock) {
+            if (canMove(currentX_, currentY_ - 1)) {
+                currentY_--;
+            }
         }
     }
 
     void dropCurrentBlock() {
+        if(current_execution_state_ != executionState::droppingBlock) {
+            return;
+        }
         switch (currentRotation_)
         {
             case rotationEnum::BottomUp:
@@ -407,6 +420,9 @@ protected:
     }
 
     void rotateCurrentBlock() {
+        if(current_execution_state_ != executionState::droppingBlock) {
+            return;
+        }
         switch (currentRotation_)
         {
             case rotationEnum::BottomUp:
