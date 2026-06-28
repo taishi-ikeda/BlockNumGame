@@ -189,7 +189,7 @@ protected:
                 canMoveDown = canMove(currentX_, currentY_+1) && canMove(currentX_, currentY_);
                 break;
             case rotationEnum::UpBottom:
-                canMoveDown = canMove(currentX_, currentY_+1) && canMove(currentX_, currentY_);
+                canMoveDown = canMove(currentX_, currentY_+2) && canMove(currentX_, currentY_+1);
                 break;
             case rotationEnum::LeftRight:
                 canMoveDown = canMove(currentX_, currentY_+1) && canMove(currentX_ + 1, currentY_+1);

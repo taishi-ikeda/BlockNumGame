@@ -113,10 +113,6 @@ public:
         control_layout_->addWidget(right_button_);  
         main_layout_->addLayout(control_layout_);
 
-        // ウィンドウサイズの設定
-        const int window_size_x = initial_block_size*initial_col_count + x_margin;
-        const int window_size_y = initial_block_size*initial_row_count + y_margin;
-        //setFixedSize(window_size_x, window_size_y);
         this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(start_button_, &QPushButton::clicked, this, &MainWindow::onStartClicked);
         connect(reset_button_, &QPushButton::clicked, this, &MainWindow::onResetClicked);
@@ -129,7 +125,6 @@ public:
         connect(drop_button_, &QPushButton::clicked, this, &MainWindow::onDropClicked);
         connect(speed_combobox_, &QComboBox::currentTextChanged, this, &MainWindow::onSpeedChanged);
 
-        // タイマーの設定（1秒ごとに落下）
         timer_ = new QTimer(this);
         connect(timer_, &QTimer::timeout, this, &MainWindow::gameLoop);
 
@@ -155,11 +150,10 @@ public:
             return;
         }
         box_window_->stepExecute();
-        update(); // 画面再描画
+        update(); 
     }
 
 protected:
-    // キーボード入力処理
     void keyPressEvent(QKeyEvent *event) override {
         if (event->key() == Qt::Key_Left) {
             box_window_->decrementCurrentX();
@@ -172,10 +166,9 @@ protected:
         } else if (event->key() == Qt::Key_Space) {
             box_window_->dropCurrentBlock();
         }
-        update(); // 画面を更新
+        update(); 
     }
 
-    // 描画処理（1マスの四角形の中に文字を描く）
     void paintEvent(QPaintEvent *event) override {
         Q_UNUSED(event);
         if(box_window_->isPause()) {
