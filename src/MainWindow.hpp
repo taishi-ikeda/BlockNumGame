@@ -49,8 +49,8 @@ public:
         const int initial_block_size = 40;
         const int initial_row_count = 12;
         const int initial_col_count = 6;
-        const int x_margin = 80;
-        const int y_margin = 80;
+        //const int x_margin = 80;
+        //const int y_margin = 80;
         const sizeEnum initial_size = sizeEnum::s12x6;
         const blockNumEnum initial_blockNum = blockNumEnum::sum4b1;
         current_speed_ = speedEnum::Normal;
