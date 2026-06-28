@@ -25,7 +25,8 @@ public:
                 blockNum_(blockNum),
                 size_(size),
                 width_(width),
-                height_(height) {
+                height_(height),
+                score_(0) {
         //setFixedSize(width, height);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
@@ -88,6 +89,7 @@ public:
         board_.clear();
         board_.resize(row_, std::vector<std::pair<blockColor, int>>(col_, {blockColor::None, 0}));
         current_execution_state_ = executionState::pauseGame;
+        score_ = 0;
     }
 
     void start() {
@@ -108,6 +110,7 @@ public:
         currentBlockInfo_[0] = std::make_pair(static_cast<blockColor>(0), 0);
         currentBlockInfo_[1] = std::make_pair(static_cast<blockColor>(0), 0);
         game_over_ = false;
+        score_ = 0;
         update();
     }
 
@@ -297,6 +300,7 @@ protected:
                             board_[p.y()][p.x()].second = 0;
                             anyErased = true;
                         }
+                        score_ += sum;
                         // 消えた後の自由落下処理（簡易版）
                         current_execution_state_ = executionState::applyingGravity; 
                     }
@@ -460,6 +464,10 @@ protected:
         return current_execution_state_ == executionState::pauseGame;
     }
 
+    int getScore() const {
+        return score_;
+    }
+
    private:
     void drawBlock(QPainter &painter, int x, int y, std::pair<blockColor,int>  blockInfo) {
         if (blockInfo.first == blockColor::None) return;
@@ -507,6 +515,7 @@ protected:
     int height_;
     executionState current_execution_state_;
     const double small_eps = 1e-1;
+    int score_;
 
 };
 

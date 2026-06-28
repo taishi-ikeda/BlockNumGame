@@ -14,6 +14,7 @@
 #include <QHBoxLayout>
 #include <QString>
 #include <QDebug>
+#include <QLineEdit>
 #include "BoxWindow.hpp"
 #include "Enum.hpp"
 
@@ -27,6 +28,7 @@ protected:
     QHBoxLayout *setup_layout_;
     QHBoxLayout *control_layout_;
     QHBoxLayout *game_layout_;
+    QHBoxLayout *score_layout_;
 
     QPushButton *start_button_;
     QPushButton *reset_button_;
@@ -42,6 +44,8 @@ protected:
     QPushButton *right_button_;
     QPushButton *rotate_button_;
     QPushButton *drop_button_;
+
+    QLineEdit *score_line_;
 
 public:
     MainWindow(QWidget *parent = nullptr) : 
@@ -89,8 +93,16 @@ public:
         setup_layout_->addWidget(speed_combobox_);
 
         main_layout_->addLayout(setup_layout_);
-
         main_layout_->addLayout(botton_layout_);
+
+        score_layout_ = new QHBoxLayout();
+        score_line_ = new QLineEdit(this);
+        score_line_->setReadOnly(true);
+        score_line_->setText("Score: 0");
+        score_line_->setAlignment(Qt::AlignCenter);
+        score_line_->setFocusPolicy(Qt::NoFocus);
+        score_layout_->addWidget(score_line_);
+        main_layout_->addLayout(score_layout_);
 
         game_layout_ = new QHBoxLayout();
         box_window_ = new BoxWindow(initial_block_size*initial_col_count, 
@@ -113,6 +125,9 @@ public:
         control_layout_->addWidget(right_button_);  
         main_layout_->addLayout(control_layout_);
 
+        //const int window_size_x = initial_block_size*initial_col_count + x_margin;
+        //const int window_size_y = initial_block_size*initial_row_count + y_margin;
+        //setFixedSize(window_size_x, window_size_y);
         this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(start_button_, &QPushButton::clicked, this, &MainWindow::onStartClicked);
         connect(reset_button_, &QPushButton::clicked, this, &MainWindow::onResetClicked);
@@ -150,20 +165,26 @@ public:
             return;
         }
         box_window_->stepExecute();
-        update(); 
+        score_line_->setText(QString("Score: %1").arg(box_window_->getScore()));
+        update();
     }
 
 protected:
     void keyPressEvent(QKeyEvent *event) override {
         if (event->key() == Qt::Key_Left) {
+            //qDebug() << "Left key pressed";
             box_window_->decrementCurrentX();
         } else if (event->key() == Qt::Key_Right) {
+            //qDebug() << "Right key pressed";
             box_window_->incrementCurrentX();
         } else if (event->key() == Qt::Key_Down) {
+            //qDebug() << "Down key pressed";
             box_window_->incrementCurrentY();
         } else if (event->key() == Qt::Key_Up) {
+            //qDebug() << "Up key pressed";
             box_window_->rotateCurrentBlock();
         } else if (event->key() == Qt::Key_Space) {
+            //qDebug() << "Space key pressed";
             box_window_->dropCurrentBlock();
         }
         update(); 
