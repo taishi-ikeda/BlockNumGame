@@ -9,7 +9,9 @@ class BoxWindow : public QWidget {
     Q_OBJECT
 
 public:
-    BoxWindow(const int width, 
+    BoxWindow(const int assume_width,
+              const int assume_height,
+              const int width, 
               const int height,
               const sizeEnum size,
               const ruleEnum rule,
@@ -24,6 +26,8 @@ public:
                 start_(false),
                 rule_(rule),
                 size_(size),
+                assume_width_(assume_width),
+                assume_height_(assume_height),
                 width_(width),
                 height_(height),
                 score_(0) {
@@ -45,26 +49,29 @@ public:
         size_ = size;
         rule_ = rule;
 
+        const int actual_width = assume_width_;//this->width();
+        const int actual_height = assume_height_;//->height();
+
         switch (size_) {
             case sizeEnum::s12x6:
-                row_ = 12;
-                col_ = 6;
-                blockSize_ = 40;
+                row_ = 12* (actual_height / assume_height_);
+                col_ = 6* (actual_width / assume_width_);
+                blockSize_ = 30*(actual_width / assume_width_);
                 break;
             case sizeEnum::s14x7:
-                row_ = 14;
-                col_ = 7;
-                blockSize_ = 40*(6./7.);
+                row_ = 14* (actual_height / assume_height_);
+                col_ = 7* (actual_width / assume_width_);
+                blockSize_ = 30*(6./7.) * (actual_width / assume_width_);
                 break;
             case sizeEnum::s16x8:
-                row_ = 16;
-                col_ = 8;
-                blockSize_ = 40*(6./8.);
+                row_ = 16* (actual_height / assume_height_);
+                col_ = 8 * (actual_width / assume_width_);
+                blockSize_ = 30*(6./8.) * (actual_width / assume_width_);
                 break;
             case sizeEnum::s19x9:
-                row_ = 19;
-                col_ = 9;
-                blockSize_ = 40*(6./9.);
+                row_ = 19* (actual_height / assume_height_);
+                col_ = 9 * (actual_width / assume_width_);
+                blockSize_ = 30*(6./9.) * (actual_width / assume_width_);
                 break;
         }
 
@@ -435,21 +442,37 @@ protected:
             case rotationEnum::BottomUp:
                 if(canRotate(rotationEnum::LeftRight)) {
                     currentRotation_ = rotationEnum::LeftRight;
+                } else if(canRotate(rotationEnum::UpBottom)) {
+                    currentRotation_ = rotationEnum::UpBottom;
+                } else if(canRotate(rotationEnum::RightLeft)) {
+                    currentRotation_ = rotationEnum::RightLeft;
                 }
                 break;
             case rotationEnum::LeftRight:
                 if(canRotate(rotationEnum::UpBottom)) {
                     currentRotation_ = rotationEnum::UpBottom;
+                } else if(canRotate(rotationEnum::RightLeft)) {
+                    currentRotation_ = rotationEnum::RightLeft;
+                } else if(canRotate(rotationEnum::BottomUp)) {
+                    currentRotation_ = rotationEnum::BottomUp;
                 }
                 break;
             case rotationEnum::UpBottom:
                 if(canRotate(rotationEnum::RightLeft)) {
                     currentRotation_ = rotationEnum::RightLeft;
-                }
+                } else if(canRotate(rotationEnum::BottomUp)) {
+                    currentRotation_ = rotationEnum::BottomUp;
+                } else if(canRotate(rotationEnum::LeftRight)) {
+                    currentRotation_ = rotationEnum::LeftRight;
+                } 
                 break;
             case rotationEnum::RightLeft:
                 if(canRotate(rotationEnum::BottomUp)) {
                     currentRotation_ = rotationEnum::BottomUp;
+                } else if(canRotate(rotationEnum::LeftRight)) {
+                    currentRotation_ = rotationEnum::LeftRight;
+                } else if(canRotate(rotationEnum::UpBottom)) {
+                    currentRotation_ = rotationEnum::UpBottom;
                 }
                 break;
             default:
@@ -557,6 +580,8 @@ protected:
     bool start_;
     ruleEnum rule_;
     sizeEnum size_;
+    int assume_width_;
+    int assume_height_;
     int width_;
     int height_;
     executionState current_execution_state_;

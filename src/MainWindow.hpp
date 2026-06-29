@@ -54,9 +54,14 @@ protected:
 public:
     MainWindow(QWidget *parent = nullptr) : 
             QWidget(parent) {
-        const int initial_block_size = 40;
-        const int initial_row_count = 12;
-        const int initial_col_count = 6;
+        this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        const int assume_width = 400;
+        const int assume_height = 800;
+        const int actual_width = this->width();
+        const int actual_height = this->height();
+        const int initial_block_size = 30.*(actual_width / assume_width);
+        const int initial_row_count = 12. * (actual_height / assume_height);
+        const int initial_col_count = 6. * (actual_width / assume_width);
         //const int x_margin = 80;
         //const int y_margin = 80;
         const sizeEnum initial_size = sizeEnum::s12x6;
@@ -110,7 +115,9 @@ public:
         main_layout_->addLayout(score_layout_);
 
         game_layout_ = new QHBoxLayout();
-        box_window_ = new BoxWindow(initial_block_size*initial_col_count, 
+        box_window_ = new BoxWindow(assume_width,
+                                    assume_height,
+                                    initial_block_size*initial_col_count, 
                                     initial_block_size*initial_row_count,
                                     initial_size,
                                     initial_rule,
@@ -151,6 +158,7 @@ public:
         connect(size_combobox_, &QComboBox::currentTextChanged, this, &MainWindow::onSizeChanged);
         connect(left_button_, &QPushButton::clicked, this, &MainWindow::onLeftClicked);
         connect(right_button_, &QPushButton::clicked, this, &MainWindow::onRightClicked);
+        connect(down_button_, &QPushButton::clicked, this, &MainWindow::onDownClicked);
         connect(rotate_button_, &QPushButton::clicked, this, &MainWindow::onRotateClicked);
         connect(drop_button_, &QPushButton::clicked, this, &MainWindow::onDropClicked);
         connect(speed_combobox_, &QComboBox::currentTextChanged, this, &MainWindow::onSpeedChanged);
@@ -304,6 +312,10 @@ public slots:
 
     void onRightClicked() {
         box_window_->incrementCurrentX();
+    }
+
+    void onDownClicked() {
+        box_window_->incrementCurrentY();
     }
 
     void onRotateClicked() {
