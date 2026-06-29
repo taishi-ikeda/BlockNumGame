@@ -178,8 +178,7 @@ public:
     void gameLoop() {
         if (box_window_->isGameOver()) {
             timer_->stop();
-
-            QMessageBox::information(this, "Game Over", "Game Over!! Your score: " + QString::number(box_window_->getScore()));
+            box_window_->update();
             return;
         }
         if(box_window_->isStart() == false) {

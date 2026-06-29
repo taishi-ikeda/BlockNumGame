@@ -139,8 +139,11 @@ protected:
         //painter.fillRect(rect(), Qt::darkGray);
     
         painter.translate(offsetX, offsetY);
-
-        painter.fillRect(rect(), Qt::black);
+        if(!game_over_) {
+            painter.fillRect(rect(), Qt::black);
+        } else {
+            painter.fillRect(rect(), Qt::darkGray);
+        }
 
         for (int r = 0; r < row_; ++r) {
             for (int c = 0; c < col_; ++c) {
