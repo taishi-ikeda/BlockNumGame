@@ -15,6 +15,7 @@
 #include <QString>
 #include <QDebug>
 #include <QLineEdit>
+#include <QMessageBox>
 #include "BoxWindow.hpp"
 #include "Enum.hpp"
 
@@ -169,7 +170,8 @@ public:
     void gameLoop() {
         if (box_window_->isGameOver()) {
             timer_->stop();
-            setWindowTitle("Game Over!");
+
+            QMessageBox::information(this, "Game Over", "Game Over!! Your score: " + QString::number(box_window_->getScore()));
             return;
         }
         if(box_window_->isStart() == false) {
