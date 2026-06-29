@@ -15,5 +15,10 @@ int main(int argc, char *argv[]) {
     game.setWindowTitle("Puyo Puyo Prototype");
     game.show();
 
+    QTimer::singleShot(100, [&game]() {
+        game.activateWindow();
+        game.setFocus(Qt::ActiveWindowFocusReason);
+    });
+
     return app.exec();
 }
