@@ -7,11 +7,6 @@ enum class sizeEnum {
     s16x8, 
     s19x9
     };
-enum class blockNumEnum {
-    sum4b1, 
-    sum10b2, 
-    sum20b5
-};
 
 enum class blockColor {
     Red,
@@ -40,5 +35,13 @@ enum class speedEnum {
     Slow,
     Normal,
     Fast
+};
+
+enum class ruleEnum {
+    rule1,
+    rule2,
+    rule3,
+    rule4,
+    rule5
 };
 #endif // ENUM_HPP

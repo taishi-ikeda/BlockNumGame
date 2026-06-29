@@ -27,6 +27,7 @@ protected:
     QHBoxLayout *botton_layout_;
     QHBoxLayout *setup_layout_;
     QHBoxLayout *control_layout_;
+    QHBoxLayout *control2_layout_;
     QHBoxLayout *game_layout_;
     QHBoxLayout *score_layout_;
 
@@ -35,13 +36,15 @@ protected:
     QPushButton *pause_button_;
 
     QComboBox *size_combobox_;
-    QComboBox *blockNum_combobox_;
+    QComboBox *rule_combobox_;
     QComboBox *speed_combobox_;
     BoxWindow *box_window_;
     speedEnum current_speed_;
+    ruleEnum current_rule_;
 
     QPushButton *left_button_;
     QPushButton *right_button_;
+    QPushButton *down_button_;
     QPushButton *rotate_button_;
     QPushButton *drop_button_;
 
@@ -56,7 +59,7 @@ public:
         //const int x_margin = 80;
         //const int y_margin = 80;
         const sizeEnum initial_size = sizeEnum::s12x6;
-        const blockNumEnum initial_blockNum = blockNumEnum::sum4b1;
+        const ruleEnum initial_rule = ruleEnum::rule1;
         current_speed_ = speedEnum::Normal;
         main_layout_ = new QVBoxLayout(this);
     
@@ -77,12 +80,13 @@ public:
         setup_layout_->addWidget(new QLabel("Size:", this));
         setup_layout_->addWidget(size_combobox_);
 
-        blockNum_combobox_ = new QComboBox(this);
-        blockNum_combobox_->addItem("block_max:1, sum:4");
-        blockNum_combobox_->addItem("block_max:2, sum:10");
-        blockNum_combobox_->addItem("block_max:5, sum:20");
-        setup_layout_->addWidget(new QLabel("Block Number:", this));
-        setup_layout_->addWidget(blockNum_combobox_);
+        rule_combobox_ = new QComboBox(this);
+        rule_combobox_->addItem("Rule1");
+        rule_combobox_->addItem("Rule2");
+        rule_combobox_->addItem("Rule3");
+        rule_combobox_->addItem("Rule4");
+        rule_combobox_->addItem("Rule5");
+        setup_layout_->addWidget(rule_combobox_);
 
         speed_combobox_ = new QComboBox(this);
         speed_combobox_->addItem("Slow");
@@ -108,22 +112,32 @@ public:
         box_window_ = new BoxWindow(initial_block_size*initial_col_count, 
                                     initial_block_size*initial_row_count,
                                     initial_size,
-                                    initial_blockNum,
+                                    initial_rule,
                                     this);
-        box_window_->initialize(initial_size, initial_blockNum);
+        box_window_->initialize(initial_size, initial_rule);
         game_layout_->addWidget(box_window_);
         main_layout_->addLayout(game_layout_);
 
-        control_layout_ = new QHBoxLayout();
-        left_button_ = new QPushButton("Left", this);
-        right_button_ = new QPushButton("Right", this);
+        control2_layout_ = new QHBoxLayout();
         rotate_button_ = new QPushButton("Rotate", this);
         drop_button_ = new QPushButton("Drop", this);
+        control2_layout_->addWidget(rotate_button_);
+        control2_layout_->addWidget(drop_button_);
+        main_layout_->addLayout(control2_layout_);
+
+        control_layout_ = new QHBoxLayout();
+        left_button_ = new QPushButton("Left", this);
+        left_button_->setIcon(this->style()->standardIcon(QStyle::SP_ArrowLeft));
+        right_button_ = new QPushButton("Right", this);
+        right_button_->setIcon(this->style()->standardIcon(QStyle::SP_ArrowRight));
+        down_button_ = new QPushButton("Down", this);
+        down_button_->setIcon(this->style()->standardIcon(QStyle::SP_ArrowDown));
         control_layout_->addWidget(left_button_);
-        control_layout_->addWidget(rotate_button_);
-        control_layout_->addWidget(drop_button_);
-        control_layout_->addWidget(right_button_);  
+        control_layout_->addWidget(down_button_);
+        control_layout_->addWidget(right_button_);
         main_layout_->addLayout(control_layout_);
+
+
 
         //const int window_size_x = initial_block_size*initial_col_count + x_margin;
         //const int window_size_y = initial_block_size*initial_row_count + y_margin;
@@ -132,7 +146,7 @@ public:
         connect(start_button_, &QPushButton::clicked, this, &MainWindow::onStartClicked);
         connect(reset_button_, &QPushButton::clicked, this, &MainWindow::onResetClicked);
         connect(pause_button_, &QPushButton::clicked, this, &MainWindow::onPauseClicked);
-        connect(blockNum_combobox_, &QComboBox::currentTextChanged, this, &MainWindow::onBlockNumChanged);
+        connect(rule_combobox_, &QComboBox::currentTextChanged, this, &MainWindow::onRuleChanged);
         connect(size_combobox_, &QComboBox::currentTextChanged, this, &MainWindow::onSizeChanged);
         connect(left_button_, &QPushButton::clicked, this, &MainWindow::onLeftClicked);
         connect(right_button_, &QPushButton::clicked, this, &MainWindow::onRightClicked);
@@ -147,7 +161,7 @@ public:
         reset_button_->setEnabled(false);
         pause_button_->setEnabled(false);
 
-        blockNum_combobox_->setEnabled(true);
+        rule_combobox_->setEnabled(true);
         size_combobox_->setEnabled(true);
         speed_combobox_->setEnabled(true);
     }
@@ -215,7 +229,7 @@ public slots:
         reset_button_->setEnabled(true);
         pause_button_->setEnabled(true);
 
-        blockNum_combobox_->setEnabled(false);
+        rule_combobox_->setEnabled(false);
         size_combobox_->setEnabled(false);
         speed_combobox_->setEnabled(false);
 
@@ -230,7 +244,7 @@ public slots:
         reset_button_->setEnabled(false);
         pause_button_->setEnabled(false);
 
-        blockNum_combobox_->setEnabled(true);
+        rule_combobox_->setEnabled(true);
         size_combobox_->setEnabled(true);
         speed_combobox_->setEnabled(true);
     }
@@ -255,14 +269,19 @@ public slots:
         }
     }
 
-    void onBlockNumChanged(const QString &text) {
-        if (text == "block_max:1, sum:4") {
-            box_window_->setBlockNum(blockNumEnum::sum4b1);
-        } else if (text == "block_max:2, sum:10") {
-            box_window_->setBlockNum(blockNumEnum::sum10b2);
-        } else if (text == "block_max:5, sum:20") {
-            box_window_->setBlockNum(blockNumEnum::sum20b5);
+    void onRuleChanged(const QString &text) {
+        if (text == "Rule1") {
+            current_rule_ = ruleEnum::rule1;
+        } else if (text == "Rule2") {
+            current_rule_ = ruleEnum::rule2;
+        } else if (text == "Rule3") {
+            current_rule_ = ruleEnum::rule3;
+        } else if (text == "Rule4") {
+            current_rule_ = ruleEnum::rule4;
+        } else if (text == "Rule5") {
+            current_rule_ = ruleEnum::rule5;
         }
+        box_window_->setRule(current_rule_);
     }
 
     void onSizeChanged(const QString &text) {

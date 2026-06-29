@@ -12,7 +12,7 @@ public:
     BoxWindow(const int width, 
               const int height,
               const sizeEnum size,
-              const blockNumEnum blockNum,
+              const ruleEnum rule,
               QWidget *parent = nullptr) 
                 : QWidget(parent),
                 row_(0), 
@@ -22,7 +22,7 @@ public:
                 currentY_(0),
                 game_over_(false),
                 start_(false),
-                blockNum_(blockNum),
+                rule_(rule),
                 size_(size),
                 width_(width),
                 height_(height),
@@ -33,17 +33,17 @@ public:
 
     void setSize(sizeEnum size) {
         size_ = size;
-        this->initialize(size_, blockNum_);
+        this->initialize(size_, rule_);
     }
 
-    void setBlockNum(blockNumEnum blockNum) {
-        blockNum_ = blockNum;
-        this->initialize(size_, blockNum_);
+    void setRule(ruleEnum rule) {
+        rule_ = rule;
+        this->initialize(size_, rule_);
     }
 
-    void initialize(sizeEnum size, blockNumEnum blockNum) {
+    void initialize(sizeEnum size, ruleEnum rule) {
         size_ = size;
-        blockNum_ = blockNum;
+        rule_ = rule;
 
         switch (size_) {
             case sizeEnum::s12x6:
@@ -72,18 +72,21 @@ public:
         height_ = row_ * blockSize_;
         setFixedSize(width_, height_);
 
-        switch (blockNum_) {
-            case blockNumEnum::sum4b1:
+        switch (rule_) {
+            case ruleEnum::rule1:
                 blockMaxNum_ = 1;
-                blockSumNum_ = 4;
                 break;
-            case blockNumEnum::sum10b2:
+            case ruleEnum::rule2:
                 blockMaxNum_ = 2;
-                blockSumNum_ = 10;
                 break;
-            case blockNumEnum::sum20b5:
+            case ruleEnum::rule3:
                 blockMaxNum_ = 5;
-                blockSumNum_ = 20;
+                break;
+            case ruleEnum::rule4:
+                blockMaxNum_ = 3;
+                break;
+            case ruleEnum::rule5:
+                blockMaxNum_ = 5;
                 break;
         }
         board_.clear();
@@ -234,9 +237,9 @@ protected:
     void spawnPuyo() {
         currentX_ = col_ / 2;
         currentY_ = 0;
-        const int currentBlockColor1 = (rand() % 3) + 1;
+        const int currentBlockColor1 = (rand() % 4);
         const int currentBoxNumber1 = (rand() % blockMaxNum_) + 1;
-        const int currentBlockColor2 = (rand() % 3) + 1;
+        const int currentBlockColor2 = (rand() % 4) ;
         const int currentBoxNumber2 = (rand() % blockMaxNum_) + 1;
         currentBlockInfo_[0] = std::make_pair(static_cast<blockColor>(currentBlockColor1), 
                             currentBoxNumber1);
@@ -294,7 +297,7 @@ protected:
                     }
 
                     // 4つ以上繋がっていたら消去
-                    if (sum >= blockSumNum_ && connected.size() >= 4) {
+                    if (this->conditionErase(sum) && connected.size() >= 4) {
                         for (const QPoint& p : connected) {
                             board_[p.y()][p.x()].first = blockColor::None;
                             board_[p.y()][p.x()].second = 0;
@@ -496,12 +499,55 @@ protected:
                          blockSize_ - 2.*small_eps);
     }
 
+    inline bool conditionErase(const int sum) {
+        switch (rule_)
+        {
+        case ruleEnum::rule1:
+            if(sum >= 4) {
+                return true;
+            } else {
+                return false;
+            }
+            break;
+        case ruleEnum::rule2:
+            if(sum >= 10) {
+                return true;
+            } else {
+                return false;
+            }
+            break;
+        case ruleEnum::rule3:
+            if(sum >= 20) {
+                return true;
+            } else {
+                return false;
+            }
+            break;
+        case ruleEnum::rule4:
+            if(sum % 4 == 0) {
+                return true;
+            } else {
+                return false;
+            }
+            break;
+        case ruleEnum::rule5:
+            if(sum % 7 == 0) {
+                return true;
+            } else {
+                return false;
+            }
+            break;
+        default:
+            break;
+        }
+        return false;
+    }
+
     private:
     int row_;
     int col_;
     int blockSize_;
     int blockMaxNum_;
-    int blockSumNum_;
     std::vector<std::vector<std::pair<blockColor, int>>> board_;
     int currentX_;
     int currentY_;
@@ -509,7 +555,7 @@ protected:
     rotationEnum currentRotation_;
     bool game_over_;
     bool start_;
-    blockNumEnum blockNum_;
+    ruleEnum rule_;
     sizeEnum size_;
     int width_;
     int height_;
